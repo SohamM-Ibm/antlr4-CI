@@ -258,7 +258,7 @@ jobs:
         CMAKE_GENERATOR: Ninja
 
     - name: Test runtime (non-Windows)
-      if: (startsWith(matrix.os, 'self-hosted') && (matrix.target != 'tool')
+      if: (startsWith(matrix.os, 'self-hosted')) && (matrix.target != 'tool')
       run: |
         env
 
