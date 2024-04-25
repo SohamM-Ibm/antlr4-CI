@@ -236,7 +236,7 @@ jobs:
         swift-version: '5.2'
 
     - name: Use ccache
-      if: startswith(matrix.os, 'self-hosted')) && (matrix.target == 'cpp')
+      if: startswith(matrix.os, 'self-hosted') && (matrix.target == 'cpp')
       uses: hendrikmuhs/ccache-action@v1.2
       with:
         key: ${{ matrix.os }}-${{ matrix.target }}
