@@ -35,7 +35,7 @@ jobs:
       if: startswith(matrix.os, 'self-hosted')
       run: |
         sudo apt-get update -qq
-        sudo apt install -y ninja-build build-essential sudo,
+        sudo apt install -y ninja-build build-essential sudo
 
     - name: Setup Clang
       if: (matrix.compiler == 'clang')
