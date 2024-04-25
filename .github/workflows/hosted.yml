@@ -6,47 +6,36 @@ concurrency:
 
 on:
   push:
-    branches: [ master, dev, hostedci, soham-CI ]
+    branches: [ soham-CI ]
   pull_request:
-    branches: [ master, dev, soham-CI ]
+    branches: [ soham-CI ]
 
 permissions:
   contents: read
 
 jobs:
   cpp-lib-build:
-    runs-on: ${{ matrix.os }}
+    runs-on: self-hosted
 
     strategy:
       fail-fast: false
       matrix:
         os: [ self-hosted ]
-        compiler: [ clang, gcc ]
+        compiler: [ gcc ]
         unity_build: [ ON, OFF ]
         exclude:
           - os: windows-2022
             compiler: gcc
-        include:
-          - os: windows-2022
-            compiler: cl
 
     steps:
     - name: Install dependencies (Ubuntu)
       if: startswith(matrix.os, 'self-hosted')
       run: |
         sudo apt-get update -qq
-        sudo apt install -y ninja-build build-essential sudo
-
-    - name: Setup Clang
-      if: (matrix.compiler == 'clang')
-      uses: egor-tensin/setup-clang@v1
-      with:
-        version: 13
-        platform: s390x
-        cygwin: 0
+        sudo apt install -y ninja-build build-essential gcc g++ cmake
 
     - name: Check out code
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
 
     - name: Use ccache
       if: startswith(matrix.os, 'self-hosted')
@@ -78,7 +67,7 @@ jobs:
         cmake --build out/Release -j %NUMBER_OF_PROCESSORS%
         if %errorlevel% neq 0 exit /b %errorlevel%
 
-    - name: Build (non-Windows)
+    - name: Build
       if: startswith(matrix.os, 'self-hosted')
       run: |
         if [ "${{matrix.compiler}}" == "clang" ]; then
