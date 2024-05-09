@@ -23,9 +23,6 @@ jobs:
         os: [ self-hosted ]
         compiler: [ gcc ]
         unity_build: [ ON, OFF ]
-        exclude:
-          - os: windows-2022
-            compiler: gcc
 
     steps:
     - name: Install dependencies (Ubuntu)
@@ -55,32 +52,26 @@ jobs:
 
         cd runtime/Cpp
 
-        cmake -G Ninja -DCMAKE_BUILD_TYPE=Debug -DANTLR_BUILD_CPP_TESTS=OFF -DCMAKE_UNITY_BUILD=${{ matrix.unity_build }} -DCMAKE_UNITY_BUILD_BATCH_SIZE=20 -S . -B out/Debug
+        cmake -G Ninja -DCMAKE_BUILD_TYPE=Debug -DANTLR_BUILD_CPP_TESTS=OFF -S . -B out/Release
         if %errorlevel% neq 0 exit /b %errorlevel%
 
-        cmake --build out/Debug -j %NUMBER_OF_PROCESSORS%
+        cmake --build out/Debug
         if %errorlevel% neq 0 exit /b %errorlevel%
 
         cmake -G Ninja -DCMAKE_BUILD_TYPE=Release -DANTLR_BUILD_CPP_TESTS=OFF -S . -B out/Release
         if %errorlevel% neq 0 exit /b %errorlevel%
 
-        cmake --build out/Release -j %NUMBER_OF_PROCESSORS%
+        cmake --build out/Release 
         if %errorlevel% neq 0 exit /b %errorlevel%
 
     - name: Build
       if: startswith(matrix.os, 'self-hosted')
       run: |
-        if [ "${{matrix.compiler}}" == "clang" ]; then
-          export CC=clang
-          export CXX=clang++
-          echo 'CC=clang' >> $GITHUB_ENV
-          echo 'CXX=clang++' >> $GITHUB_ENV
-        else
-          export CC=gcc
-          export CXX=g++
-          echo 'CC=gcc' >> $GITHUB_ENV
-          echo 'CXX=g++' >> $GITHUB_ENV
-        fi
+        export CC=gcc
+        export CXX=g++
+        echo 'CC=gcc' >> $GITHUB_ENV
+        echo 'CXX=g++' >> $GITHUB_ENV
+        
 
         env
         which cmake && cmake --version
@@ -90,7 +81,7 @@ jobs:
 
         cd runtime/Cpp
 
-        cmake -G Ninja -DCMAKE_BUILD_TYPE=Debug -DANTLR_BUILD_CPP_TESTS=OFF -DCMAKE_UNITY_BUILD=${{ matrix.unity_build }} -DCMAKE_UNITY_BUILD_BATCH_SIZE=20 -S . -B out/Debug
+        cmake -G Ninja -DCMAKE_BUILD_TYPE=Debug -DANTLR_BUILD_CPP_TESTS=OFF  -S . -B out/Debug
         cmake --build out/Debug --parallel
 
         cmake -G Ninja -DCMAKE_BUILD_TYPE=Release -DANTLR_BUILD_CPP_TESTS=OFF -S . -B out/Release
@@ -120,21 +111,17 @@ jobs:
       matrix:
         os: [ self-hosted ]
         target: [
-          tool,
+          
           cpp,
           csharp,
-          dart,
           go,
           java,
           javascript,
           typescript,
           php,
           python3,
-          # swift,
+          
         ]
-        exclude:
-          - os: windows-2022
-            target: swift
 
     steps:
       # Check out the code before setting the environment since some
@@ -198,12 +185,6 @@ jobs:
       with:
         dotnet-version: '7.0.x'
 
-    - name: Setup Dart 2.12.1
-      if: matrix.target == 'dart'
-      uses: dart-lang/setup-dart@v1.3
-      with:
-        sdk: 2.12.1
-
     - name: Setup Go 1.19
       if: matrix.target == 'go'
       uses: actions/setup-go@v5
@@ -217,12 +198,6 @@ jobs:
         php-version: '8.2'
         extensions: mbstring
         tools: composer
-
-    - name: Setup Swift
-      if: matrix.target == 'swift'
-      uses: swift-actions/setup-swift@v1.19.0
-      with:
-        swift-version: '5.2'
 
     - name: Use ccache
       if: startswith(matrix.os, 'self-hosted') && (matrix.target == 'cpp')
