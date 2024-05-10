@@ -55,7 +55,7 @@ jobs:
         cmake -G Ninja -DCMAKE_BUILD_TYPE=Debug -DANTLR_BUILD_CPP_TESTS=OFF -S . -B out/Release
         
 
-        cmake --build out/Debug
+        cmake --build out/Release
         
 
         cmake -G Ninja -DCMAKE_BUILD_TYPE=Release -DANTLR_BUILD_CPP_TESTS=OFF -S . -B out/Release
@@ -133,8 +133,9 @@ jobs:
 
     - name: Checkout antlr PHP runtime
       if: matrix.target == 'php'
-      uses: actions/checkout@v4
+      uses: actions/checkout@v3
       with:
+        arch: s390x
         repository: antlr/antlr-php-runtime
         path: runtime/PHP
 
@@ -144,8 +145,6 @@ jobs:
       if: matrix.target == 'php'
       run: |-
         cd runtime/PHP
-        curl -sS https://getcomposer.org/installer | sudo php -- --install-dir=/usr/local/bin --filename=composer
-        composer --version
         composer install --no-progress --no-interaction --prefer-dist --optimize-autoloader
 
     - name: Install dependencies (Ubuntu)
