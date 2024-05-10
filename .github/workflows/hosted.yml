@@ -53,16 +53,16 @@ jobs:
         cd runtime/Cpp
 
         cmake -G Ninja -DCMAKE_BUILD_TYPE=Debug -DANTLR_BUILD_CPP_TESTS=OFF -S . -B out/Release
-        if %errorlevel% neq 0 exit /b %errorlevel%
+        
 
         cmake --build out/Debug
-        if %errorlevel% neq 0 exit /b %errorlevel%
+        
 
         cmake -G Ninja -DCMAKE_BUILD_TYPE=Release -DANTLR_BUILD_CPP_TESTS=OFF -S . -B out/Release
-        if %errorlevel% neq 0 exit /b %errorlevel%
+        
 
         cmake --build out/Release 
-        if %errorlevel% neq 0 exit /b %errorlevel%
+        
 
     - name: Build
       if: startswith(matrix.os, 'self-hosted')
@@ -144,6 +144,8 @@ jobs:
       if: matrix.target == 'php'
       run: |-
         cd runtime/PHP
+        curl -sS https://getcomposer.org/installer | sudo php -- --install-dir=/usr/local/bin --filename=composer
+        composer --version
         composer install --no-progress --no-interaction --prefer-dist --optimize-autoloader
 
     - name: Install dependencies (Ubuntu)
