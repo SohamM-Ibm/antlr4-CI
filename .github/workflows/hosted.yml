@@ -111,7 +111,7 @@ jobs:
       matrix:
         os: [ self-hosted ]
         target: [
-          
+          tool,
           cpp,
           csharp,
           go,
@@ -151,7 +151,7 @@ jobs:
       if: startswith(matrix.os, 'self-hosted')
       run: |
         sudo apt-get update -qq
-        sudo apt install -y ninja-build build-essential gcc g++ cmake clang wget tar curl
+        sudo apt install -y ninja-build build-essential gcc g++ cmake clang wget tar curl unzip
 
     - name: Set up JDK 11
       id: setup-java
@@ -216,6 +216,7 @@ jobs:
     - name: Test tool
       if: matrix.target == 'tool'
       run: |
+        
         cd tool-testsuite
         mvn test
 
