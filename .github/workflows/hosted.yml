@@ -29,7 +29,7 @@ jobs:
       if: startswith(matrix.os, 'self-hosted')
       run: |
         sudo apt-get update -qq
-        sudo apt install -y sudo ninja-build build-essential gcc g++ cmake clang
+        sudo apt install -y sudo ninja-build build-essential gcc g++ cmake clang unzip
 
     - name: Check out code
       uses: actions/checkout@v4
