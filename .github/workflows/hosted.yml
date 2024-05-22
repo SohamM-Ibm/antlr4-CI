@@ -129,7 +129,11 @@ jobs:
       # dependencies, for instance, the setup-java actually parses
       # **/pom.xml files to decide what to cache.
     - name: Check out code
+      run: sudo chmod -R u+w /opt/actions-runner/_work/
       uses: actions/checkout@v4
+      with:
+        arch: s390x
+        
 
     - name: Checkout antlr PHP runtime
       if: matrix.target == 'php'
