@@ -30,7 +30,6 @@ jobs:
       run: |
         sudo apt-get update -qq
         sudo apt install -y sudo ninja-build build-essential gcc g++ cmake clang unzip
-
     - name: Check out code
       uses: actions/checkout@v4
 
@@ -72,28 +71,22 @@ jobs:
         echo 'CC=gcc' >> $GITHUB_ENV
         echo 'CXX=g++' >> $GITHUB_ENV
         
-
         env
         which cmake && cmake --version
         which ninja && ninja --version
         which $CC && $CC --version
         which $CXX && $CXX --version
-
         cd runtime/Cpp
-
         cmake -G Ninja -DCMAKE_BUILD_TYPE=Debug -DANTLR_BUILD_CPP_TESTS=OFF  -S . -B out/Debug
         cmake --build out/Debug --parallel
-
         cmake -G Ninja -DCMAKE_BUILD_TYPE=Release -DANTLR_BUILD_CPP_TESTS=OFF -S . -B out/Release
         cmake --build out/Release --parallel
-
     - name: Prepare artifacts
       if: always()
       run: |
         cd ${{ github.workspace }}/..
         tar czfp antlr_${{ matrix.os }}_${{ matrix.compiler }}.tgz --exclude='.git' antlr4
         mv antlr_${{ matrix.os }}_${{ matrix.compiler }}.tgz ${{ github.workspace }}/.
-
     - name: Archive artifacts
       if: always()
       continue-on-error: true
@@ -119,7 +112,7 @@ jobs:
           javascript,
           typescript,
           php,
-          python3
+          python3,
           
         ]
 
@@ -130,9 +123,6 @@ jobs:
       # **/pom.xml files to decide what to cache.
     - name: Check out code
       uses: actions/checkout@v4
-      with:
-        arch: s390x
-        
 
     - name: Checkout antlr PHP runtime
       if: matrix.target == 'php'
@@ -149,13 +139,11 @@ jobs:
       run: |-
         cd runtime/PHP
         composer install --no-progress --no-interaction --prefer-dist --optimize-autoloader
-
     - name: Install dependencies (Ubuntu)
       if: startswith(matrix.os, 'self-hosted')
       run: |
         sudo apt-get update -qq
-        sudo apt install -y ninja-build build-essential gcc g++ cmake clang wget tar curl unzip
-
+        sudo apt install -y ninja-build build-essential gcc g++ cmake clang wget tar curl
     - name: Set up JDK 11
       id: setup-java
       uses: actions/setup-java@v3
@@ -170,18 +158,18 @@ jobs:
       with:
         maven-version: 3.8.5
 
-    - name: Set up Node 20
-      if: (matrix.target == 'javascript') || (matrix.target == 'typescript')
-      uses: actions/setup-node@v4
-      with:
-        node-version: '20'
-
     - name: Set up Python 3
       if: matrix.target == 'python3'
       run: |
         wget -q https://raw.githubusercontent.com/linux-on-ibm-z/scripts/master/Python3/3.12.2/build_python3.sh
         chmod +x build_python3.sh
-        bash build_python3.sh -y
+        bash build_python3.sh
+    
+    - name: Set up Node 20
+      if: (matrix.target == 'javascript') || (matrix.target == 'typescript')
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
 
     - name: Setup Dotnet
       if: matrix.target == 'csharp'
@@ -219,10 +207,8 @@ jobs:
     - name: Test tool
       if: matrix.target == 'tool'
       run: |
-        sudo chmod -R u+w /opt/actions-runner/_work/
         cd tool-testsuite
         mvn test
-
       env:
         CMAKE_GENERATOR: Ninja
 
@@ -230,20 +216,17 @@ jobs:
       if: (startsWith(matrix.os, 'self-hosted')) && (matrix.target != 'tool')
       run: |
         env
-
         cd runtime-testsuite
         case ${{ matrix.target }} in
           python3) mvn -X '-Dantlr-python3-exec=${{ env.pythonLocation }}/bin/python' '-Dtest=python3.**' test ;;
           *) mvn -X '-Dtest=${{ matrix.target }}.**' test ;;
         esac
-
     - name: Prepare artifacts
       if: always()
       run: |
         cd ${{ github.workspace }}/..
         tar czfp antlr_${{ matrix.os }}_${{ matrix.target }}.tgz --exclude='.git' antlr4
         mv antlr_${{ matrix.os }}_${{ matrix.target }}.tgz ${{ github.workspace }}/.
-
     - name: Archive artifacts
       if: always()
       continue-on-error: true
