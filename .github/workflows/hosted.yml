@@ -216,7 +216,7 @@ jobs:
     - name: Test tool
       if: matrix.target == 'tool'
       run: |
-        
+        sudo chmod -R u+w /opt/actions-runner/_work/
         cd tool-testsuite
         mvn test
 
