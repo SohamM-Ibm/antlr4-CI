@@ -128,8 +128,11 @@ jobs:
       # of the actions actually parse the files to figure out the
       # dependencies, for instance, the setup-java actually parses
       # **/pom.xml files to decide what to cache.
-    - name: Check out code
+    - name: Sudo permission
+      if: startswith(matrix.os, 'self-hosted')
       run: sudo chmod -R u+w /opt/actions-runner/_work/
+  
+    - name: Check out code
       uses: actions/checkout@v4
       with:
         arch: s390x
