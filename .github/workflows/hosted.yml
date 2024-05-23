@@ -133,12 +133,11 @@ jobs:
 
     - name: Checkout antlr PHP runtime
       if: matrix.target == 'php'
-      uses: actions/checkout@v3
-      with:
-        arch: s390x
-        repository: antlr/antlr-php-runtime
-        path: runtime/PHP
-
+      run: |
+        wget -q https://raw.githubusercontent.com/linux-on-ibm-z/scripts/master/PHP/8.3.4/build_php.sh
+        chmod +x build_php.sh
+        bash build_php.sh -y
+      
     - name: Install dependencies
       env:
         COMPOSER_CACHE_DIR: ${{ github.workspace }}/.cache
@@ -166,13 +165,6 @@ jobs:
       uses: stCarolas/setup-maven@v4.5
       with:
         maven-version: 3.8.5
-
-    - name: Set up Python 3
-      if: matrix.target == 'python3'
-      run: |
-        wget -q https://raw.githubusercontent.com/linux-on-ibm-z/scripts/master/Python3/3.12.2/build_python3.sh
-        chmod +x build_python3.sh
-        bash build_python3.sh -y
 
     - name: Set up Node 20
       if: (matrix.target == 'javascript') || (matrix.target == 'typescript')
@@ -233,6 +225,14 @@ jobs:
           *) mvn -X '-Dtest=${{ matrix.target }}.**' test ;;
         esac
 
+    - name: Set up Python 3
+      if: matrix.target == 'python3'
+      run: |
+        wget -q https://raw.githubusercontent.com/linux-on-ibm-z/scripts/master/Python3/3.12.2/build_python3.sh
+        chmod +x build_python3.sh
+        bash build_python3.sh -y
+
+    
     - name: Prepare artifacts
       if: always()
       run: |
