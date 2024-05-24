@@ -1,4 +1,4 @@
-name: antlr4
+name: antlr4-CI
 
 concurrency:
   group: ${{ github.repository }}-${{ github.workflow }}-${{ github.ref }}
@@ -137,6 +137,11 @@ jobs:
         wget -q https://raw.githubusercontent.com/linux-on-ibm-z/scripts/master/PHP/8.3.4/build_php.sh
         chmod +x build_php.sh
         bash build_php.sh -y
+        /usr/local/bin/php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
+        /usr/local/bin/php -r "if (hash_file('sha384', 'composer-setup.php') === 'dac665fdc30fdd8ec78b38b9800061b4150413ff2e3b6f88543c636f7cd84f6db9189d43a81e5503cda447da73c7e5b6') { echo 'Installer verified'; } else { echo 'Installer corrupt'; unlink('composer-setup.php'); } echo PHP_EOL;"
+        /usr/local/bin/php composer-setup.php
+        /usr/local/bin/php -r "unlink('composer-setup.php');"
+        sudo mv composer.phar /usr/local/bin/composer
       
     - name: Install dependencies
       env:
@@ -144,7 +149,7 @@ jobs:
       if: matrix.target == 'php'
       run: |-
         cd runtime/PHP
-        composer install --no-progress --no-interaction --prefer-dist --optimize-autoloader
+        /usr/local/bin/composer install --no-progress --no-interaction --prefer-dist --optimize-autoloader
 
     - name: Install dependencies (Ubuntu)
       if: startswith(matrix.os, 'self-hosted')
