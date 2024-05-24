@@ -52,10 +52,10 @@ jobs:
 
         cd runtime/Cpp
 
-        cmake -G Ninja -DCMAKE_BUILD_TYPE=Debug -DANTLR_BUILD_CPP_TESTS=OFF -S . -B out/Release
+        cmake -G Ninja -DCMAKE_BUILD_TYPE=Debug -DANTLR_BUILD_CPP_TESTS=OFF -S . -B out/Debug
         
 
-        cmake --build out/Release
+        cmake --build out/Debug
         
 
         cmake -G Ninja -DCMAKE_BUILD_TYPE=Release -DANTLR_BUILD_CPP_TESTS=OFF -S . -B out/Release
