@@ -131,9 +131,18 @@ jobs:
     - name: Check out code
       uses: actions/checkout@v4
 
-    - name: Checkout antlr PHP runtime
+     - name: Checkout antlr PHP runtime
       if: matrix.target == 'php'
-      run: |
+      uses: actions/checkout@v3
+      with:
+        repository: antlr/antlr-php-runtime
+        path: runtime/PHP
+         
+    - name: Install dependencies
+      env:
+        COMPOSER_CACHE_DIR: ${{ github.workspace }}/.cache
+      if: matrix.target == 'php'
+      run: |-
         wget -q https://raw.githubusercontent.com/linux-on-ibm-z/scripts/master/PHP/8.3.4/build_php.sh
         chmod +x build_php.sh
         bash build_php.sh -y
@@ -142,15 +151,18 @@ jobs:
         /usr/local/bin/php composer-setup.php
         /usr/local/bin/php -r "unlink('composer-setup.php');"
         sudo mv composer.phar /usr/local/bin/composer
-      
-    - name: Install dependencies
-      env:
-        COMPOSER_CACHE_DIR: ${{ github.workspace }}/.cache
-      if: matrix.target == 'php'
-      run: |-
         cd runtime/PHP
         /usr/local/bin/composer install --no-progress --no-interaction --prefer-dist --optimize-autoloader
 
+     - name: Setup PHP 8.2
+      if: matrix.target == 'php'
+      uses: shivammathur/setup-php@2.22.0
+      with:
+        php-version: '8.2'
+        extensions: mbstring
+        tools: composer
+
+      
     - name: Install dependencies (Ubuntu)
       if: startswith(matrix.os, 'self-hosted')
       run: |
@@ -190,14 +202,6 @@ jobs:
       uses: actions/setup-go@v5
       with:
         go-version: '^1.19'
-
-    - name: Setup PHP 8.2
-      if: matrix.target == 'php'
-      uses: shivammathur/setup-php@2.22.0
-      with:
-        php-version: '8.2'
-        extensions: mbstring
-        tools: composer
 
     - name: Use ccache
       if: startswith(matrix.os, 'self-hosted') && (matrix.target == 'cpp')
