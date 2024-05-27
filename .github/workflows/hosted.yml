@@ -179,9 +179,10 @@ jobs:
 
     - name: Setup Dotnet
       if: matrix.target == 'csharp'
-      uses: actions/setup-dotnet@v4
-      with:
-        dotnet-version: '7.0.x'
+      run: |
+        wget -q https://dot.net/v1/dotnet-install.sh
+        chmod +x dotnet-install.sh --channel 7.0.0xx
+        
 
     - name: Setup Go 1.19
       if: matrix.target == 'go'
