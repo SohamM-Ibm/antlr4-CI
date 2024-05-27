@@ -179,9 +179,10 @@ jobs:
 
     - name: Setup Dotnet
       if: matrix.target == 'csharp'
-      run: |
-        wget -q https://dot.net/v1/dotnet-install.sh
-        chmod +x dotnet-install.sh --channel 7.0.0xx
+      uses: actions/setup-dotnet@v3.0.3
+      with:
+        dotnet-version: '7.0.x'
+        arch: s390x
         
 
     - name: Setup Go 1.19
